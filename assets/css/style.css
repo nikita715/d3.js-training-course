@@ -1,0 +1,35 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.main-header {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.training-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.initial-data {
+    min-height: 50px;
+}
+
+.html-editor {
+    
+}
+
+.js-editor {
+    
+}
+
+.user-interpretation {
+    
+}
+
+.sample-interpretation {
+    
+}

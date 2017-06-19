@@ -10,7 +10,10 @@
 
 <body>
     <header class="main-header">
-        Обучающий курс по d3.js
+        <div class="main-header__container">
+            Обучающий курс по d3.js
+            <button class="open-support">?</button>
+        </div>
     </header>
 
     <div class="workspace">
@@ -28,11 +31,18 @@
             <iframe id="result_iframe"></iframe>
 
             <div class="block-result__controls">
-                <button id="btn-info">Информация</button>
                 <button id="btn-compare" onclick="compare()">Проверить</button>
                 <button id="btn-next" disabled="disabled" onclick="location.href = './task2.html'">Следующее задание</button>
-                
             </div>
+        </div>
+    </div>
+    
+    <div class="support-window">
+        <div class="support">
+            <button class="support__close">Закрыть</button>
+            <h2>Задание 1</h2>
+            <p>D3.js - это библиотека JavaScript для создания динамических интерактивных визуализаций данных в веб-браузерах. В этом курсе мы познакомимся с некоторыми механизмами визуализации из этой библиотеки. <span class="code-highlight">Воспользуемся</span> такой формой представления данных как гистограммы.</p>
+            
         </div>
     </div>
 
@@ -52,7 +62,7 @@
             '\t<style>\n' +
             '\t\t.chart div {\n' +
             '\t\t\tfont: 10px sans-serif;\n' +
-            '\t\t\tbackground-color: steelblue;\n' +
+            '\t\t\tbackground-color: black;\n' +
             '\t\t\ttext-align: right;\n' +
             '\t\t\tpadding: 3px;\n' +
             '\t\t\tmargin: 1px;\n' +
@@ -110,32 +120,6 @@
             '\t.text(function(d) { return d; });'
     );
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
         in_result_iframe.open();
         in_result_iframe.write(example_html + "<script>" + array_data + js_editor.getValue() + "<\/script>");
         in_result_iframe.close();
@@ -145,7 +129,6 @@
             in_result_iframe.write(example_html + "<script>" + array_data + js_editor.getValue() + "<\/script>");
             in_result_iframe.close();
         });
-
 
         function compare() {
             html2canvas(in_example_iframe.body, {
@@ -163,9 +146,7 @@
                                 image.src = data.getImageDataUrl();
 
                                 if (data.rawMisMatchPercentage <= 15) {
-                                    set_cookie("finish_lesson-first", "true");
-                                    $("#next-level").css('pointer-events', 'auto');
-                                    $("#next-level").css('background-color', 'rgba(3,195,3,0.23');
+                                    $("#btn-next").attr("disabled", "");
                                 }
                             });
                         }
@@ -189,50 +170,13 @@
         }
     </script>
     <script>
-        function set_cookie(name, value, exp_y, exp_m, exp_d, path, domain, secure) {
-            var cookie_string = name + "=" + escape(value);
-
-            if (exp_y) {
-                var expires = new Date(exp_y, exp_m, exp_d);
-                cookie_string += "; expires=" + expires.toGMTString();
-            }
-
-            if (path)
-                cookie_string += "; path=" + escape(path);
-
-            if (domain)
-                cookie_string += "; domain=" + escape(domain);
-
-            if (secure)
-                cookie_string += "; secure";
-
-            document.cookie = cookie_string;
-        }
-
-        function get_cookie(cookie_name) {
-            var results = document.cookie.match('(^|;) ?' + cookie_name + '=([^;]*)(;|$)');
-
-            if (results)
-                return (unescape(results[2]));
-            else
-                return null;
-        }
-    </script>
-    <script>
         $(window).load(function () {
-            var first_open = get_cookie("open_modal-first");
-            var finish_lesson = get_cookie("finish_lesson-first");
-            if (first_open === null) {
-                setTimeout(function () {
-                    $('#lesson-info').trigger('click');
-                }, 100);
-                set_cookie("open_modal-first", "true");
-            }
-            console.log(finish_lesson);
-            if (finish_lesson) {
-                $("#next-level").css('pointer-events', 'auto');
-                $("#next-level").css('background-color', 'rgba(3,195,3,0.23');
-            }
+            $(".support__close").click(function() {
+                $(".support-window").css("display", "none");
+            });
+            $(".open-support").click(function() {
+                $(".support-window").css("display", "block");
+            });
         });
     </script>
 </body>

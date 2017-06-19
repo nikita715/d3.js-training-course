@@ -10,7 +10,10 @@
 
 <body>
     <header class="main-header">
-        Обучающий курс по d3.js
+        <div class="main-header__container">
+            Обучающий курс по d3.js
+            <button class="open-support">?</button>
+        </div>
     </header>
 
     <div class="workspace">
@@ -28,11 +31,16 @@
             <iframe id="result_iframe"></iframe>
 
             <div class="block-result__controls">
-                <button id="btn-info">Информация</button>
                 <button id="btn-compare" onclick="compare()">Проверить</button>
-                <button id="btn-next" disabled="disabled" onclick="location.href = './task3.html'">Следующее задание</button>
-                
+                <button id="btn-next" disabled="disabled" onclick="location.href = './task2.html'">Следующее задание</button>
             </div>
+        </div>
+    </div>
+    
+    <div class="support-window">
+        <div class="support">
+            <button class="support__close">Закрыть</button>
+            <h2>Задание 2</h2>
         </div>
     </div>
 
@@ -122,7 +130,6 @@
         });
 
         function compare() {
-            <!-- Iframe to Canvas-->
             html2canvas(in_example_iframe.body, {
                 onrendered: function (ex_canvas) {
                     example_canvas = ex_canvas;
@@ -133,14 +140,12 @@
                             var result_string = result_canvas.toDataURL();
                             <!-- Compare 2 Iframes -->
                             resemble(example_string).compareTo(result_string).onComplete(function (data) {
-                                document.getElementById('result_button').innerHTML = Math.floor(100 - data.rawMisMatchPercentage) + ' %';
+                                document.getElementById('result_button').innerHTML = Math.floor(100 - data.rawMisMatchPercentage) + '%';
                                 var image = new Image();
                                 image.src = data.getImageDataUrl();
-                                document.getElementById("diff_div").appendChild(image);
+
                                 if (data.rawMisMatchPercentage <= 15) {
-                                    set_cookie("finish_lesson-second", "true");
-                                    $("#next-level").css('pointer-events', 'auto');
-                                    $("#next-level").css('background-color', 'rgba(3,195,3,0.23');
+                                    $("#btn-next").attr("disabled", "");
                                 }
                             });
                         }
@@ -148,30 +153,14 @@
                 }
             });
         }
-    </script>
-    <script>
-        $(window).load(function () {
-            var first_open = get_cookie("open_modal-second");
-            var finish_lesson = get_cookie("finish_lesson-second");
-            if (first_open == null) {
-                setTimeout(function () {
-                    $('#lesson-info').trigger('click');
-                }, 100);
-                set_cookie("open_modal-second", "true");
-            }
-            if (finish_lesson) {
-                $("#next-level").css('pointer-events', 'auto');
-                $("#next-level").css('background-color', 'rgba(3,195,3,0.23');
-            }
-        });
-    </script>
-    <script>
+
         function user_result() {
             $(document).ready(function () {
                 $("#diff_div").css('display', 'none');
                 $("#result_iframe").css('display', 'block');
             });
         }
+
         function show_diff() {
             $(document).ready(function () {
                 $("#diff_div").css('display', 'block');
@@ -180,34 +169,15 @@
         }
     </script>
     <script>
-        function set_cookie(name, value, exp_y, exp_m, exp_d, path, domain, secure) {
-            var cookie_string = name + "=" + escape(value);
-
-            if (exp_y) {
-                var expires = new Date(exp_y, exp_m, exp_d);
-                cookie_string += "; expires=" + expires.toGMTString();
-            }
-
-            if (path)
-                cookie_string += "; path=" + escape(path);
-
-            if (domain)
-                cookie_string += "; domain=" + escape(domain);
-
-            if (secure)
-                cookie_string += "; secure";
-
-            document.cookie = cookie_string;
-        }
-        function get_cookie(cookie_name) {
-            var results = document.cookie.match('(^|;) ?' + cookie_name + '=([^;]*)(;|$)');
-
-            if (results)
-                return ( unescape(results[2]) );
-            else
-                return null;
-        }
+        $(window).load(function () {
+            $(".support__close").click(function() {
+                $(".support-window").css("display", "none");
+            });
+            $(".open-support").click(function() {
+                $(".support-window").css("display", "block");
+            });
+        });
     </script>
-</div>
 </body>
+
 </html>

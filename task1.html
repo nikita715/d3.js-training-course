@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <title>Обучающий курс по d3.js</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+</head>
+
+<body>
+    <header class="main-header">
+        Обучающий курс по d3.js
+    </header>
+
+    <div class="workspace">
+        <div class="block block-js-editor">
+            <div class="block__name">JavaScript - редактор</div>
+            <div class="js_editor" id="js_editor"></div>
+        </div>
+        <div class="block block-example">
+            <div class="block__name">Образец</div>
+            <iframe id="example_iframe"></iframe>
+        </div>
+        <div class="block block-result">
+            <div class="block__name">Результат</div>
+            <span class="percent_result" id="result_button">0%</span>
+            <iframe id="result_iframe"></iframe>
+
+            <div class="block-result__controls">
+                <button id="btn-info">Информация</button>
+                <button id="btn-compare" onclick="compare()">Проверить</button>
+                <button id="btn-next" disabled="disabled" onclick="location.href = './task2.html'">Следующее задание</button>
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="assets/js/html2canvas.js"></script>
+    <script src="assets/js/resemble.js"></script>
+    <!-- Don't forget to download ace-builds folder-->
+    <script src="assets/js/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var example_canvas;
+        var result_canvas;
+
+        var example_html =
+            '<html>\n' +
+            '<head>\n' +
+            '\t<title>Result</title>\n' +
+            '\t<style>\n' +
+            '\t\t.chart div {\n' +
+            '\t\t\tfont: 10px sans-serif;\n' +
+            '\t\t\tbackground-color: steelblue;\n' +
+            '\t\t\ttext-align: right;\n' +
+            '\t\t\tpadding: 3px;\n' +
+            '\t\t\tmargin: 1px;\n' +
+            '\t\t\tcolor: white;\n' +
+            '\t\t}\n' +
+            '\t</style>\n' +
+            '</head>\n' +
+            '<body>\n' +
+            '\t<div class="chart"></div>\n' +
+            '\t<script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"><\/script>\n' +
+            '</body>\n' +
+            '</html>';
+
+        var array_data = 'var data = [10, 5, 15, 5, 25, 10];';
+
+        var example_js =
+            'var data = [10, 5, 15, 5, 25, 10, 5];\n' +
+            '\n' +
+            'var x = d3.scale.linear()\n' +
+            '\t.domain([0, d3.max(data)])\n' +
+            '\t.range([0, 300]);\n' +
+            '\n' +
+            'd3.select(".chart")\n' +
+            '\t.selectAll("div")\n' +
+            '\t.data(data)\n' +
+            '\t.enter().append("div")\n' +
+            '\t.style("width", function(d) { return x(d) + "px"; })\n' +
+            '\t.text(function(d) { return d; });';
+
+        var example_iframe = document.getElementById('example_iframe');
+        var in_example_iframe = example_iframe.contentDocument || example_iframe.contentWindow.document;
+
+        var result_iframe = document.getElementById('result_iframe');
+        var in_result_iframe = result_iframe.contentDocument || result_iframe.contentWindow.document;
+
+        in_example_iframe.open();
+        in_example_iframe.write(example_html + "<script>" + array_data + example_js + "<\/script>");
+        in_example_iframe.close();
+
+        var js_editor = ace.edit("js_editor");
+        js_editor.setTheme("ace/theme/github");
+        js_editor.getSession().setMode("ace/mode/javascript");
+        js_editor.setValue(
+            'var data = [10, 5, 15, 5, 25, 10];\n' +
+            '\n' +
+            'var x = d3.scale.linear()\n' +
+            '\t.domain([0, d3.max(data)])\n' +
+            '\t.range([0, 432]);\n' +
+            '\n' +
+            'd3.select(".chart")\n' +
+            '\t.selectAll("div")\n' +
+            '\t.data(data)\n' +
+            '\t.enter().append("div")\n' +
+            '\t.style("width", function(d) { return x(d) + "px"; })\n' +
+            '\t.text(function(d) { return d; });'
+    );
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        in_result_iframe.open();
+        in_result_iframe.write(example_html + "<script>" + array_data + js_editor.getValue() + "<\/script>");
+        in_result_iframe.close();
+
+        js_editor.getSession().on('change', function () {
+            in_result_iframe.open();
+            in_result_iframe.write(example_html + "<script>" + array_data + js_editor.getValue() + "<\/script>");
+            in_result_iframe.close();
+        });
+
+
+        function compare() {
+            html2canvas(in_example_iframe.body, {
+                onrendered: function (ex_canvas) {
+                    example_canvas = ex_canvas;
+                    html2canvas(in_result_iframe.body, {
+                        onrendered: function (res_canvas) {
+                            result_canvas = res_canvas;
+                            var example_string = example_canvas.toDataURL();
+                            var result_string = result_canvas.toDataURL();
+                            <!-- Compare 2 Iframes -->
+                            resemble(example_string).compareTo(result_string).onComplete(function (data) {
+                                document.getElementById('result_button').innerHTML = Math.floor(100 - data.rawMisMatchPercentage) + '%';
+                                var image = new Image();
+                                image.src = data.getImageDataUrl();
+
+                                if (data.rawMisMatchPercentage <= 15) {
+                                    set_cookie("finish_lesson-first", "true");
+                                    $("#next-level").css('pointer-events', 'auto');
+                                    $("#next-level").css('background-color', 'rgba(3,195,3,0.23');
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function user_result() {
+            $(document).ready(function () {
+                $("#diff_div").css('display', 'none');
+                $("#result_iframe").css('display', 'block');
+            });
+        }
+
+        function show_diff() {
+            $(document).ready(function () {
+                $("#diff_div").css('display', 'block');
+                $("#result_iframe").css('display', 'none');
+            });
+        }
+    </script>
+    <script>
+        function set_cookie(name, value, exp_y, exp_m, exp_d, path, domain, secure) {
+            var cookie_string = name + "=" + escape(value);
+
+            if (exp_y) {
+                var expires = new Date(exp_y, exp_m, exp_d);
+                cookie_string += "; expires=" + expires.toGMTString();
+            }
+
+            if (path)
+                cookie_string += "; path=" + escape(path);
+
+            if (domain)
+                cookie_string += "; domain=" + escape(domain);
+
+            if (secure)
+                cookie_string += "; secure";
+
+            document.cookie = cookie_string;
+        }
+
+        function get_cookie(cookie_name) {
+            var results = document.cookie.match('(^|;) ?' + cookie_name + '=([^;]*)(;|$)');
+
+            if (results)
+                return (unescape(results[2]));
+            else
+                return null;
+        }
+    </script>
+    <script>
+        $(window).load(function () {
+            var first_open = get_cookie("open_modal-first");
+            var finish_lesson = get_cookie("finish_lesson-first");
+            if (first_open === null) {
+                setTimeout(function () {
+                    $('#lesson-info').trigger('click');
+                }, 100);
+                set_cookie("open_modal-first", "true");
+            }
+            console.log(finish_lesson);
+            if (finish_lesson) {
+                $("#next-level").css('pointer-events', 'auto');
+                $("#next-level").css('background-color', 'rgba(3,195,3,0.23');
+            }
+        });
+    </script>
+</body>
+
+</html>

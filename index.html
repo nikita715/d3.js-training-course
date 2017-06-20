@@ -13,13 +13,22 @@
         <div class="main-header__container">
             Обучающий курс по d3.js
             <button class="open-support">?</button>
+            <div class="courses-links">
+                <a href="index.html" class="course-link course-link--active">1</a>
+                <a href="task2.html" class="course-link">2</a>
+                <a href="task3.html" class="course-link">3</a>
+            </div>
         </div>
     </header>
 
     <div class="workspace">
-        <div class="block block-js-editor">
+        <div class="block">
+            <div class="block__name">HTML - редактор</div>
+            <div class="code_editor" id="html_editor"></div>
+        </div>
+        <div class="block">
             <div class="block__name">JavaScript - редактор</div>
-            <div class="js_editor" id="js_editor"></div>
+            <div class="code_editor" id="js_editor"></div>
         </div>
         <div class="block block-example">
             <div class="block__name">Образец</div>
@@ -27,13 +36,9 @@
         </div>
         <div class="block block-result">
             <div class="block__name">Результат</div>
-            <span class="percent_result" id="result_button">0%</span>
+            <span class="percent_result" id="block-result__match">0%</span>
             <iframe id="result_iframe"></iframe>
-
-            <div class="block-result__controls">
-                <button id="btn-compare" onclick="compare()">Проверить</button>
-                <button id="btn-next" disabled="disabled" onclick="location.href = './task2.html'">Следующее задание</button>
-            </div>
+            <button id="btn-compare" class="block-result__compare" onclick="compare()">Проверить</button>
         </div>
     </div>
     
@@ -42,14 +47,12 @@
             <button class="support__close">Закрыть</button>
             <h2>Задание 1</h2>
             <p>D3.js - это библиотека JavaScript для создания динамических интерактивных визуализаций данных в веб-браузерах. В этом курсе мы познакомимся с некоторыми механизмами визуализации из этой библиотеки. <span class="code-highlight">Воспользуемся</span> такой формой представления данных как гистограммы.</p>
-            
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="assets/js/jquery-3.2.1.min.js"></script>
     <script src="assets/js/html2canvas.js"></script>
     <script src="assets/js/resemble.js"></script>
-    <!-- Don't forget to download ace-builds folder-->
     <script src="assets/js/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
         var example_canvas;
@@ -60,10 +63,10 @@
             '<head>\n' +
             '\t<title>Result</title>\n' +
             '\t<style>\n' +
-            '\t\t.chart div {\n' +
+            '\t\t.diagram div {\n' +
             '\t\t\tfont: 10px sans-serif;\n' +
             '\t\t\tbackground-color: black;\n' +
-            '\t\t\ttext-align: right;\n' +
+            '\t\t\ttext-align: left;\n' +
             '\t\t\tpadding: 3px;\n' +
             '\t\t\tmargin: 1px;\n' +
             '\t\t\tcolor: white;\n' +
@@ -71,7 +74,7 @@
             '\t</style>\n' +
             '</head>\n' +
             '<body>\n' +
-            '\t<div class="chart"></div>\n' +
+            '\t<div class="diagram"></div>\n' +
             '\t<script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"><\/script>\n' +
             '</body>\n' +
             '</html>';
@@ -85,7 +88,7 @@
             '\t.domain([0, d3.max(data)])\n' +
             '\t.range([0, 300]);\n' +
             '\n' +
-            'd3.select(".chart")\n' +
+            'd3.select(".diagram")\n' +
             '\t.selectAll("div")\n' +
             '\t.data(data)\n' +
             '\t.enter().append("div")\n' +
@@ -101,6 +104,12 @@
         in_example_iframe.open();
         in_example_iframe.write(example_html + "<script>" + array_data + example_js + "<\/script>");
         in_example_iframe.close();
+        
+        var html_editor = ace.edit("html_editor");
+        html_editor.setTheme("ace/theme/github");
+        html_editor.getSession().setMode("ace/mode/html");
+        html_editor.setValue(example_html, 1);
+        html_editor.setReadOnly(true);
 
         var js_editor = ace.edit("js_editor");
         js_editor.setTheme("ace/theme/github");
@@ -112,11 +121,12 @@
             '\t.domain([0, d3.max(data)])\n' +
             '\t.range([0, 432]);\n' +
             '\n' +
-            'd3.select(".chart")\n' +
+            'd3.select(".diagram")\n' +
             '\t.selectAll("div")\n' +
             '\t.data(data)\n' +
             '\t.enter().append("div")\n' +
             '\t.style("width", function(d) { return x(d) + "px"; })\n' +
+	        '\t.style("text-align", "right")\n' +
             '\t.text(function(d) { return d; });'
     );
 
@@ -141,12 +151,12 @@
                             var result_string = result_canvas.toDataURL();
                             <!-- Compare 2 Iframes -->
                             resemble(example_string).compareTo(result_string).onComplete(function (data) {
-                                document.getElementById('result_button').innerHTML = Math.floor(100 - data.rawMisMatchPercentage) + '%';
+                                document.getElementById('block-result__match').innerHTML = Math.floor(100 - data.rawMisMatchPercentage) + '%';
                                 var image = new Image();
                                 image.src = data.getImageDataUrl();
 
-                                if (data.rawMisMatchPercentage <= 15) {
-                                    $("#btn-next").attr("disabled", "");
+                                if (data.rawMisMatchPercentage === 0) {
+                                    $(".block-result__compare").css("display", "none");
                                 }
                             });
                         }
@@ -154,29 +164,11 @@
                 }
             });
         }
-
-        function user_result() {
-            $(document).ready(function () {
-                $("#diff_div").css('display', 'none');
-                $("#result_iframe").css('display', 'block');
-            });
-        }
-
-        function show_diff() {
-            $(document).ready(function () {
-                $("#diff_div").css('display', 'block');
-                $("#result_iframe").css('display', 'none');
-            });
-        }
-    </script>
-    <script>
-        $(window).load(function () {
-            $(".support__close").click(function() {
-                $(".support-window").css("display", "none");
-            });
-            $(".open-support").click(function() {
-                $(".support-window").css("display", "block");
-            });
+        $(".support__close").click(function() {
+            $(".support-window").css("display", "none");
+        });
+        $(".open-support").click(function() {
+            $(".support-window").css("display", "block");
         });
     </script>
 </body>

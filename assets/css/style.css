@@ -116,6 +116,7 @@ iframe {
     z-index: 1000;
     top: 0;
     left: 0;
+    display: none;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
@@ -146,9 +147,4 @@ iframe {
     background-color: white;
     border: 3px solid #f7df1e;
     box-sizing: border-box;
-}
-
-.code-highlight {
-    background-color: blue;
-    color: white;
 }
